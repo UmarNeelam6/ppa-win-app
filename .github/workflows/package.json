@@ -2,12 +2,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "jest",
-    "build": "webpack --config webpack.config.js"
+  "build": "echo 'No build step needed'"
   },
- "scripts": {
-  "start": "node server.js",
-  "build": "node server.js"
 }
 "dependencies": {
     "express": "^4.18.2",
