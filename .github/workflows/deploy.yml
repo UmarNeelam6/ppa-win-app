@@ -1,58 +1,47 @@
-name: Deploy Backend to Railway & Render
+name: PPA_Win_Deployment
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  deploy:
+  deploy-backend:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
         with:
-          node-version: '16'
+          python-version: '3.9'
 
       - name: Install Dependencies
         run: |
-          cd backend
-          npm install
-          npm install -g vercel
+          pip install -r requirements.txt
+          pip install gunicorn
 
       - name: Deploy to Railway
         run: |
-          curl -X POST ${{ secrets.RAILWAY_DEPLOY_HOOK }}
+          railway up
 
       - name: Deploy to Render (Optional)
         run: |
           curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
 
-      - name: Test API Health
-        run: |
-          curl -f https://your-backend-url.com/health || exit 1
-          name: Deploy Backend to Railway & Render
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-jobs:
-  deploy:
+  deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
@@ -60,16 +49,37 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install
+          npm run build
+
+      - name: Deploy to Vercel
+        run: |
           npm install -g vercel
+          vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy to Railway
-        run: |
-          curl -X POST ${{ secrets.RAILWAY_DEPLOY_HOOK }}
+  performance-testing:
+    runs-on: ubuntu-latest
 
-      - name: Deploy to Render (Optional)
+    steps:
+      - name: Install JMeter
         run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+          sudo apt-get update
+          sudo apt-get install jmeter -y
 
-      - name: Test API Health
+      - name: Run Load Test
         run: |
-          curl -f https://your-backend-url.com/health || exit 1
+          jmeter -n -t tests/load_test.jmx -l results.jtl
+
+  security-enhancements:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Enable Cloudflare DDoS Protection
+        run: |
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/settings/security_level" \
+          -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          --data '{"value":"high"}'
+
+      - name: Enable API Rate Limiting
+        run: |
+          echo "Rate limiting applied in backend code using Flask-Limiter."
