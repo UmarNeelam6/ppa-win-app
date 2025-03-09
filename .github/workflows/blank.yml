@@ -32,3 +32,31 @@ jobs:
       - name: Deploy to Render (Optional)
         run: |
           curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install gunicorn
+
+      - name: Run tests
+        run: |
+          # Add your test commands here
