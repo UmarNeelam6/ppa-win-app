@@ -1,85 +1,23 @@
-name: PPA_Win_Deployment
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  deploy-backend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.9'
-
-      - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install gunicorn
-
-      - name: Deploy to Railway
-        run: |
-          railway up
-
-      - name: Deploy to Render (Optional)
-        run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
-
-  deploy-frontend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
-      - name: Install Dependencies
-        run: |
-          npm install
-          npm run build
-
-      - name: Deploy to Vercel
-        run: |
-          npm install -g vercel
-          vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-  performance-testing:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Install JMeter
-        run: |
-          sudo apt-get update
-          sudo apt-get install jmeter -y
-
-      - name: Run Load Test
-        run: |
-          jmeter -n -t tests/load_test.jmx -l results.jtl
-
-  security-enhancements:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Enable Cloudflare DDoS Protection
-        run: |
-          curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/settings/security_level" \
-          -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          --data '{"value":"high"}'
-
-      - name: Enable API Rate Limiting
-        run: |
-          echo "Rate limiting applied in backend code using Flask-Limiter."
+{
+  "name": "ppa-win-backend",
+  "version": "1.0.0",
+  "description": "Backend for PPA Win App",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest",
+    "build": "webpack --config webpack.config.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.3.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "jsonwebtoken": "^9.0.0",
+    "bcryptjs": "^2.4.3"
+  },
+  "devDependencies": {
+    "jest": "^29.6.0",
+    "supertest": "^6.3.1"
+  }
+}
