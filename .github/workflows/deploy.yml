@@ -36,3 +36,40 @@ jobs:
       - name: Test API Health
         run: |
           curl -f https://your-backend-url.com/health || exit 1
+          name: Deploy Backend to Railway & Render
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies
+        run: |
+          npm install
+          npm install -g vercel
+
+      - name: Deploy to Railway
+        run: |
+          curl -X POST ${{ secrets.RAILWAY_DEPLOY_HOOK }}
+
+      - name: Deploy to Render (Optional)
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+      - name: Test API Health
+        run: |
+          curl -f https://your-backend-url.com/health || exit 1
