@@ -1,0 +1,10 @@
+flask
+flask-cors
+gunicorn
+pymongo
+Flask-Limiter
+requests
+numpy
+joblib
+textblob
+dotenv
