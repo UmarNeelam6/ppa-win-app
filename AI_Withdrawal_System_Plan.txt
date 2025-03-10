@@ -6,7 +6,7 @@
 
 2. AI-Based Fund Management
 - Auto-Balance Management – AI monitors available funds in payment gateways.
-- Smart Fund Allocation – AI auto-transfers funds if balance is low in any gateway.
+- Smart und Allocation – AI auto-transfers funds if balance is low in any gateway.
 - Instant Liquidity Management – AI optimizes crypto, bank, and wallet transactions for instant withdrawals.
 
 3. AI-Driven Customer Support
