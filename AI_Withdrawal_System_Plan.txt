@@ -1,4 +1,3 @@
-
 1. AI-Based Transaction Verification
 - User Behavior Analysis – AI will analyze if the user is genuine.
 - Fraud Detection – AI will hold or verify transactions with unusual patterns.
